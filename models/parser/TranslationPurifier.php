@@ -3,6 +3,7 @@
 namespace humhub\modules\translation\models\parser;
 
 use HTMLPurifier_AttrDef_Enum;
+use HTMLPurifier_AttrDef_Text;
 use yii\helpers\HtmlPurifier;
 
 class TranslationPurifier extends HtmlPurifier
@@ -17,7 +18,7 @@ class TranslationPurifier extends HtmlPurifier
         $config->set('Attr.EnableID', true);
 
         // Allow specific tags and attributes
-        $config->set('HTML.Allowed', 'p,b,i,u,s,a[href|target],img[src|alt],ul,ol,li,blockquote,code,pre,span,hr,br,strong');
+        $config->set('HTML.Allowed', 'p,b,i,u,s,a[href|target|title],img[src|alt],ul,ol,li,blockquote,code,pre,span,hr,br,strong');
 
         // Allow the attribute `target="_blank"` for links
         $config->set('Attr.AllowedFrameTargets', ['_blank']);
@@ -30,9 +31,13 @@ class TranslationPurifier extends HtmlPurifier
 
         // To avoid escaping inside the attributes
         $def = $config->getHTMLDefinition(true);
+
+        // Apply ParameterURIDef to <a> tag
         $def->addAttribute('a', 'href', new ParameterURIDef());
         $def->addAttribute('a', 'target', new HTMLPurifier_AttrDef_Enum(['_blank', '_self', '_parent', '_top']));
+        $def->addAttribute('a', 'title', new HTMLPurifier_AttrDef_Text());
         $def->addAttribute('img', 'src', new ParameterURIDef());
+        $def->addAttribute('img', 'alt', new HTMLPurifier_AttrDef_Text());
     }
 
     /**
